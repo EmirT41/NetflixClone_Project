@@ -489,15 +489,15 @@ class ProgramController:
             "avg_rating":     float(stats[2]) if stats[2] else 0.0,
             "watch_history":  history,
         }
-
-    def SetActive(self, active: bool):
-        row = self.user_table.currentRow()
-        if row >= 0:
-            res = self.ctrl.adminSetUserActive(int(self.user_table.item(row,0).text()), active)
-            if res["success"]:
-                self._load_users()
-            else:
-                warn(self, "Hata", res["message"])
+    def adminSetUserActive(self, userId: int, active: bool) -> dict:
+        if not self._is_admin():
+            return {"success": False, "message": "Yetkiniz yok."}
+        try:
+            self.userRepo.setUserActive(userId, active)
+            return {"success": True, "message": "Kullanıcı durumu güncellendi."}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+    
         
 
     # ──────────────────────────────────────────────────────────────
